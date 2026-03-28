@@ -18,7 +18,7 @@ This project builds an **early-warning risk score** for HR: a model that identif
 
 ## 📊 Dataset
 
-- **1,000 employee records** from a simulated manufacturing HR system
+- **1,000 employee records** from a manufacturing HR system
 - **Target:** `high_risk` (binary) — 1 = patterns consistent with disengagement or performance decline risk
 - **Class balance:** 30.8% high-risk
 - **Source:** Simulated workforce data reflecting realistic manufacturing HR feature distributions
