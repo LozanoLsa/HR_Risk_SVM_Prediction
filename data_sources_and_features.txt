@@ -1,0 +1,188 @@
+PROJECT: HR_Risk_Analytics
+TITLE: Data Sources & Feature Engineering
+
+--------------------------------------------------
+OVERVIEW:
+This dataset integrates workforce performance, operational impact, and organizational variables from an industrial environment.
+
+The objective is to identify employees with high operational risk by linking human behavior with productivity, scrap, and stability indicators.
+
+--------------------------------------------------
+DATA SOURCES AND VARIABLE ORIGIN:
+
+1. TRAINING AND DEVELOPMENT RECORDS
+Variables:
+- training_hours_annual
+
+Taken from:
+Employee training and development logs.
+
+Reason:
+Training influences skill level, adaptability, and overall performance consistency.
+
+--------------------------------------------------
+2. ATTENDANCE AND DISCIPLINE SYSTEM
+Variables:
+- punctuality_rate
+
+Taken from:
+Attendance and time tracking systems.
+
+Reason:
+Punctuality reflects discipline and reliability, directly impacting operational flow.
+
+--------------------------------------------------
+3. PERFORMANCE AND OPERATIONS DATA
+Variables:
+- productivity_index
+- scrap_associated_pct
+
+Taken from:
+Production performance systems and quality tracking linked to operator activity.
+
+Reason:
+These variables connect employee performance with operational outcomes such as efficiency and defect generation.
+
+--------------------------------------------------
+4. ENGAGEMENT AND WORKFORCE ASSESSMENT
+Variables:
+- engagement_score
+
+Taken from:
+Internal engagement surveys or evaluation systems.
+
+Reason:
+Low engagement is often associated with reduced performance, higher variability, and increased risk.
+
+--------------------------------------------------
+5. EXPERIENCE AND ROTATION
+Variables:
+- experience_yrs
+- area_rotation_rate
+
+Taken from:
+HR records and workforce movement tracking.
+
+Reason:
+Experience stabilizes performance, while frequent rotation may increase variability and learning curve effects.
+
+--------------------------------------------------
+6. ORGANIZATIONAL CONTEXT
+Variables:
+- department
+- shift
+- contract_type
+
+Taken from:
+HR master data and workforce assignment systems.
+
+Reason:
+Different departments, shifts, and contract types operate under varying conditions and constraints.
+
+--------------------------------------------------
+7. TARGET VARIABLE (RISK CLASSIFICATION)
+Variables:
+- high_risk
+
+Taken from:
+Derived classification based on performance, variability, and operational impact.
+
+Reason:
+Indicates whether the employee represents a higher operational risk.
+
+--------------------------------------------------
+VARIABLE-BY-VARIABLE SUMMARY:
+
+training_hours_annual
+Taken from:
+Training records
+Why it was included:
+Higher training levels improve capability and reduce variability.
+
+punctuality_rate
+Taken from:
+Attendance system
+Why it was included:
+Low punctuality disrupts operational flow.
+
+productivity_index
+Taken from:
+Production systems
+Why it was included:
+Direct indicator of employee efficiency.
+
+scrap_associated_pct
+Taken from:
+Quality tracking
+Why it was included:
+Links employee behavior to defect generation.
+
+engagement_score
+Taken from:
+HR assessments
+Why it was included:
+Low engagement correlates with performance instability.
+
+experience_yrs
+Taken from:
+HR records
+Why it was included:
+Experience improves consistency and decision-making.
+
+area_rotation_rate
+Taken from:
+Workforce movement logs
+Why it was included:
+Frequent rotation increases variability.
+
+department
+Taken from:
+HR assignment data
+Why it was included:
+Different operational contexts.
+
+shift
+Taken from:
+Work schedules
+Why it was included:
+Shift conditions affect performance.
+
+contract_type
+Taken from:
+HR records
+Why it was included:
+Different contract types may influence stability and engagement.
+
+high_risk
+Taken from:
+Operational risk classification
+Why it was included:
+Defines the target for predictive modeling.
+
+--------------------------------------------------
+FEATURE ENGINEERING LOGIC:
+
+The dataset combines human behavior, operational performance, and organizational context to identify patterns associated with workforce risk.
+
+Each variable contributes to understanding how people influence process outcomes.
+
+--------------------------------------------------
+BUSINESS LOGIC:
+
+Operational risk is not only driven by machines or processes.
+
+Human factors such as engagement, experience, discipline, and workload conditions directly impact productivity, scrap, and stability.
+
+--------------------------------------------------
+GOAL:
+
+Identify high-risk employees to:
+- Improve productivity and operational stability
+- Reduce scrap associated with human factors
+- Support workforce development decisions
+- Improve retention and performance management
+
+--------------------------------------------------
+NOTE:
+
+Data originates from an industrial environment, integrating HR systems, production data, and quality tracking to connect workforce behavior with operational performance.
