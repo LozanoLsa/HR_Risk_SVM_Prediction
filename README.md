@@ -18,9 +18,9 @@ This project builds an **early-warning risk score** for HR: a model that identif
 
 ## 📊 Dataset
 
-- **1,000 employee records** from a manufacturing HR system
+- **1,247 employee records** from a manufacturing HR system across three site departments
 - **Target:** `high_risk` (binary) — 1 = patterns consistent with disengagement or performance decline risk
-- **Class balance:** 30.8% high-risk
+- **Class balance:** 30.7% high-risk
 - **Source:** Simulated workforce data reflecting realistic manufacturing HR feature distributions
 
 **Three layers of features:**
@@ -35,9 +35,9 @@ This project builds an **early-warning risk score** for HR: a model that identif
 
 | Variable | Highest Risk Group | Rate | Lowest Risk Group | Rate |
 |----------|-------------------|------|-------------------|------|
-| Contract | Temporary | 40.8% | Permanent | 25.7% |
-| Department | Administration | 38.9% | Quality | 21.7% |
-| Shift | Night | 35.1% | Afternoon | 27.0% |
+| Contract | Temporary | 40.6% | Permanent | 25.7% |
+| Department | Administration | 41.6% | Quality | 20.9% |
+| Shift | Night | 33.2% | Afternoon | 26.5% |
 
 ---
 
@@ -50,7 +50,7 @@ Employee risk doesn't follow a linear rule. A worker can have low punctuality wi
 A **LinearSVC companion** is trained alongside the main model to provide coefficient-level interpretability — the same directional transparency as logistic regression, without sacrificing predictive power for stakeholder communication.
 
 **Preprocessing:** StandardScaler on numerics, OneHotEncoder (drop_first) on categoricals, all inside a Pipeline.  
-**Tuning:** GridSearchCV scoring on F1 (correct for imbalanced data) — best: `kernel=rbf`, `C=50`, `gamma=0.01`.
+**Tuning:** GridSearchCV scoring on F1 (correct for imbalanced data) — best: `kernel=rbf`, `C=50`, `gamma='scale'`.
 
 ---
 
@@ -58,20 +58,20 @@ A **LinearSVC companion** is trained alongside the main model to provide coeffic
 
 | Metric | Value |
 |--------|-------|
-| Accuracy | 68.4% |
-| ROC-AUC | 0.659 |
-| Precision (High Risk) | 47.6% |
-| Recall (High Risk) | 26.0% |
-| F1 (High Risk) | 0.336 |
+| Accuracy | 68.9% |
+| ROC-AUC | 0.666 |
+| Precision (High Risk) | 49.4% |
+| Recall (High Risk) | 45.8% |
+| F1 (High Risk) | 0.476 |
 
-**Confusion matrix (250 test employees):**
+**Confusion matrix (312 test employees):**
 
 | | Pred: Low Risk | Pred: High Risk |
 |---|---|---|
-| **Actual: Low Risk** | 151 (TN) | 22 (FP) |
-| **Actual: High Risk** | 57 (FN) | 20 (TP) |
+| **Actual: Low Risk** | 171 (TN) | 45 (FP) |
+| **Actual: High Risk** | 52 (FN) | 44 (TP) |
 
-**Why the numbers look modest — and why that's honest:** HR behavioral data is noisier than sensor data. Human behavior is influenced by factors no dataset captures: personal circumstances, team dynamics, manager relationships. AUC 0.659 > 0.5 confirms real signal. The model's practical value is in **risk ranking** — sorting employees by probability score — not in binary classification at a fixed threshold.
+**Why the numbers look modest — and why that's honest:** HR behavioral data is noisier than sensor data. Human behavior is influenced by factors no dataset captures: personal circumstances, team dynamics, manager relationships. AUC 0.666 > 0.5 confirms real signal. The model's practical value is in **risk ranking** — sorting employees by probability score — not in binary classification at a fixed threshold.
 
 ---
 
@@ -79,15 +79,16 @@ A **LinearSVC companion** is trained alongside the main model to provide coeffic
 
 | Feature | Coefficient | Direction |
 |---------|-------------|-----------|
-| `contract_type_Permanent` | −0.269 | 🔵 Protective |
-| `engagement_score` | −0.234 | 🔵 Most actionable lever |
-| `shift_Night` | +0.268 | 🔴 Strongest structural risk |
-| `department_Quality` | −0.330 | 🔵 Protective context |
-| `experience_yrs` | −0.197 | 🔵 Protective |
-| `training_hours_annual` | −0.181 | 🔵 Investment = protection |
-| `scrap_associated_pct` | +0.162 | 🔴 Quality stress signal |
+| `department_Quality` | −0.335 | 🔵 Protective context |
+| `department_Logistics` | −0.274 | 🔵 Protective context |
+| `shift_Night` | +0.249 | 🔴 Strongest structural risk |
+| `department_Maintenance` | −0.229 | 🔵 Protective context |
+| `contract_type_Permanent` | −0.210 | 🔵 Protective |
+| `engagement_score` | −0.205 | 🔵 Most actionable lever |
+| `training_hours_annual` | −0.177 | 🔵 Investment = protection |
+| `scrap_associated_pct` | +0.170 | 🔴 Quality stress signal |
 
-Engagement score is the highest-leverage variable HR can directly influence. Night shift is the highest structural risk factor — and it can't be solved with an engagement survey. Both insights require different interventions.
+Engagement score remains the highest-leverage variable HR can directly influence. Night shift is the highest structural risk factor — and it can't be solved with an engagement survey. Department context (Quality and Logistics showing the strongest protective effect) reflects how team environment independently shapes risk. All three require different interventions.
 
 ---
 
@@ -96,12 +97,12 @@ Engagement score is the highest-leverage variable HR can directly influence. Nig
 ```
 HR_Risk_SVM_Prediction/
 ├── 04_SVM_HR_Risk_Analytics.ipynb  # Notebook (no outputs)
-├── hr_risk_svm_data.csv            # Sample dataset (250 rows)
+├── hr_risk_svm_data.csv            # Complete dataset (1,247 records)
 ├── README.md
 └── requirements.txt
 ```
 
-> 📦 **Full Project Pack** — complete dataset (1,000 rows), notebook with full outputs, presentation deck (PPTX + PDF), and `app.py` employee risk simulator available on [Gumroad](https://lozanolsa.gumroad.com).
+> 📦 **Full Project Pack** — complete dataset (1,247 rows), notebook with full outputs, presentation deck (PPTX + PDF), and `app.py` employee risk simulator available on [Gumroad](https://lozanolsa.gumroad.com).
 
 ---
 
@@ -122,7 +123,7 @@ jupyter notebook 04_SVM_HR_Risk_Analytics.ipynb
 1. **Non-linear risk needs a non-linear model** — a single low punctuality score doesn't make someone high-risk. The combination does. RBF SVM finds that boundary where logistic regression can't.
 2. **Train an interpretable companion** — RBF SVM predicts. LinearSVC explains. Same data, same preprocessing, two purposes. This pattern scales to any black-box model.
 3. **Structural factors are as important as behavioral ones** — night shift increases risk independently of how engaged the employee is. Fixing engagement without fixing structure is incomplete.
-4. **Moderate AUC in HR is not failure** — it's calibration to reality. A model claiming 95% accuracy on workforce data should raise skepticism, not admiration.
+4. **Moderate AUC in HR is not failure** — it's calibration to reality. AUC 0.666 in workforce data is honest signal, not a design flaw. A model claiming 95% accuracy on HR behavioral data should raise skepticism, not admiration.
 5. **The threshold is a business decision, not a model decision** — lowering from 0.5 to 0.3 trades precision for recall. In HR, catching more true positives (at the cost of more unnecessary conversations) is almost always the right trade.
 
 ---

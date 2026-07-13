@@ -1,188 +1,53 @@
-PROJECT: HR_Risk_Analytics
+PROJECT: 04_SVM_SUP
 TITLE: Data Sources & Feature Engineering
 
 --------------------------------------------------
 OVERVIEW:
-This dataset integrates workforce performance, operational impact, and organizational variables from an industrial environment.
-
-The objective is to identify employees with high operational risk by linking human behavior with productivity, scrap, and stability indicators.
+This dataset contains 1,247 employee records from a manufacturing HR system across three site departments. The ML task is binary classification to identify high-risk employees (high_risk = 1) showing behavioral and operational patterns consistent with disengagement or performance decline risk, with a 30.7% high-risk rate. Source: simulated workforce data reflecting realistic manufacturing HR feature distributions.
 
 --------------------------------------------------
-DATA SOURCES AND VARIABLE ORIGIN:
+REAL-WORLD DATA SOURCES:
 
-1. TRAINING AND DEVELOPMENT RECORDS
-Variables:
-- training_hours_annual
-
-Taken from:
-Employee training and development logs.
-
-Reason:
-Training influences skill level, adaptability, and overall performance consistency.
-
---------------------------------------------------
-2. ATTENDANCE AND DISCIPLINE SYSTEM
-Variables:
-- punctuality_rate
-
-Taken from:
-Attendance and time tracking systems.
-
-Reason:
-Punctuality reflects discipline and reliability, directly impacting operational flow.
+Feature                 | Source System              | Instrument
+------------------------|----------------------------|--------------------------
+punctuality_rate        | Attendance / Time Tracking System | Badge reader or time-clock system — attendance punctuality ratio
+engagement_score        | Internal Engagement Survey | Self-reported survey platform — periodic engagement score
+productivity_index      | Production Performance System | MES / production tracking — employee output ratio
+scrap_associated_pct    | Quality Tracking / Operator Log | QMS — scrap percentage attributed to this operator
+training_hours_annual   | Training & Development Records | LMS — annual training hours completed
+experience_yrs          | HR Records                 | HR master data — years in current role
+area_rotation_rate      | HR / Workforce Movement Tracking | HR system — frequency of area assignment changes
+department              | HR Master Data             | HR system — department assignment
+shift                   | HR Master Data / Work Schedules | HR system — assigned work shift
+contract_type           | HR Master Data             | HR system — contract category (Permanent / Temporary)
+high_risk               | Derived Classification     | HR analytics — risk label based on behavioral and operational patterns
 
 --------------------------------------------------
-3. PERFORMANCE AND OPERATIONS DATA
-Variables:
-- productivity_index
-- scrap_associated_pct
+VARIABLE DESCRIPTIONS:
 
-Taken from:
-Production performance systems and quality tracking linked to operator activity.
-
-Reason:
-These variables connect employee performance with operational outcomes such as efficiency and defect generation.
-
---------------------------------------------------
-4. ENGAGEMENT AND WORKFORCE ASSESSMENT
-Variables:
-- engagement_score
-
-Taken from:
-Internal engagement surveys or evaluation systems.
-
-Reason:
-Low engagement is often associated with reduced performance, higher variability, and increased risk.
+punctuality_rate       - Attendance punctuality ratio; low values reflect discipline issues that disrupt operational flow.
+engagement_score       - Self-reported engagement level; most actionable lever for HR (LinearSVC coefficient -0.205).
+productivity_index     - Direct efficiency indicator; links employee behavior to operational output.
+scrap_associated_pct   - Scrap percentage linked to this operator; connects human behavior to quality outcomes. Coefficient +0.170.
+training_hours_annual  - Annual training investment (hours); higher training reduces risk (coefficient -0.177).
+experience_yrs         - Years of experience; improves consistency and decision-making.
+area_rotation_rate     - Frequency of area rotation; excessive rotation may increase variability and learning curve effects.
+department             - Categorical: Administration (41.6% high-risk), Quality (20.9%), Logistics, Maintenance.
+shift                  - Categorical: Night shift is the strongest structural risk factor (coefficient +0.249).
+contract_type          - Categorical: Temporary (40.6% high-risk) vs Permanent (25.7%).
+high_risk              - Binary classification target: 1 = patterns consistent with disengagement or performance decline risk, 0 = low risk.
 
 --------------------------------------------------
-5. EXPERIENCE AND ROTATION
-Variables:
-- experience_yrs
-- area_rotation_rate
+FEATURE ENGINEERING:
 
-Taken from:
-HR records and workforce movement tracking.
-
-Reason:
-Experience stabilizes performance, while frequent rotation may increase variability and learning curve effects.
+StandardScaler applied to numerical features. OneHotEncoder (drop_first) applied to categorical features (department, shift, contract_type). All inside a sklearn Pipeline. GridSearchCV scoring on F1; best: kernel=rbf, C=50, gamma='scale'. A LinearSVC companion model trained alongside for coefficient-level interpretability. Train/Test split: 75/25, stratified, random_state=42.
 
 --------------------------------------------------
-6. ORGANIZATIONAL CONTEXT
-Variables:
-- department
-- shift
-- contract_type
+BUSINESS CONTEXT:
 
-Taken from:
-HR master data and workforce assignment systems.
-
-Reason:
-Different departments, shifts, and contract types operate under varying conditions and constraints.
-
---------------------------------------------------
-7. TARGET VARIABLE (RISK CLASSIFICATION)
-Variables:
-- high_risk
-
-Taken from:
-Derived classification based on performance, variability, and operational impact.
-
-Reason:
-Indicates whether the employee represents a higher operational risk.
-
---------------------------------------------------
-VARIABLE-BY-VARIABLE SUMMARY:
-
-training_hours_annual
-Taken from:
-Training records
-Why it was included:
-Higher training levels improve capability and reduce variability.
-
-punctuality_rate
-Taken from:
-Attendance system
-Why it was included:
-Low punctuality disrupts operational flow.
-
-productivity_index
-Taken from:
-Production systems
-Why it was included:
-Direct indicator of employee efficiency.
-
-scrap_associated_pct
-Taken from:
-Quality tracking
-Why it was included:
-Links employee behavior to defect generation.
-
-engagement_score
-Taken from:
-HR assessments
-Why it was included:
-Low engagement correlates with performance instability.
-
-experience_yrs
-Taken from:
-HR records
-Why it was included:
-Experience improves consistency and decision-making.
-
-area_rotation_rate
-Taken from:
-Workforce movement logs
-Why it was included:
-Frequent rotation increases variability.
-
-department
-Taken from:
-HR assignment data
-Why it was included:
-Different operational contexts.
-
-shift
-Taken from:
-Work schedules
-Why it was included:
-Shift conditions affect performance.
-
-contract_type
-Taken from:
-HR records
-Why it was included:
-Different contract types may influence stability and engagement.
-
-high_risk
-Taken from:
-Operational risk classification
-Why it was included:
-Defines the target for predictive modeling.
-
---------------------------------------------------
-FEATURE ENGINEERING LOGIC:
-
-The dataset combines human behavior, operational performance, and organizational context to identify patterns associated with workforce risk.
-
-Each variable contributes to understanding how people influence process outcomes.
-
---------------------------------------------------
-BUSINESS LOGIC:
-
-Operational risk is not only driven by machines or processes.
-
-Human factors such as engagement, experience, discipline, and workload conditions directly impact productivity, scrap, and stability.
+Used by HR business partners and operational excellence managers in manufacturing environments to enable early-warning risk scoring. A high score flags an employee for a retention conversation — not a verdict — at the right time before disengagement manifests in performance or turnover.
 
 --------------------------------------------------
 GOAL:
 
-Identify high-risk employees to:
-- Improve productivity and operational stability
-- Reduce scrap associated with human factors
-- Support workforce development decisions
-- Improve retention and performance management
-
---------------------------------------------------
-NOTE:
-
-Data originates from an industrial environment, integrating HR systems, production data, and quality tracking to connect workforce behavior with operational performance.
+Identify employees with high operational risk based on behavioral and operational patterns to improve retention, reduce scrap from human factors, and enable proactive HR intervention. Model achieved Accuracy 68.9%, AUC-ROC 0.666, Recall (High Risk) 45.8%.
